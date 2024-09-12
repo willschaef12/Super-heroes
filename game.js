@@ -1,9 +1,15 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
-const heroSize = 50;
-const villainSize = 50;
+const heroSize = 150; // Assuming images are 50x50 pixels
+const villainSize = 150;
 const heroSpeed = 5;
+
+// Load images
+const heroImage = new Image();
+const villainImage = new Image();
+heroImage.src = 'spiderman.png'; // Path to your superhero image
+villainImage.src = 'venom.webp'; // Path to your villain image
 
 // Define Hero class
 class Hero {
@@ -12,12 +18,11 @@ class Hero {
         this.y = y;
         this.width = heroSize;
         this.height = heroSize;
-        this.color = 'blue';
+        this.image = heroImage;
     }
 
     draw() {
-        ctx.fillStyle = this.color;
-        ctx.fillRect(this.x, this.y, this.width, this.height);
+        ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
     }
 
     move(dx, dy) {
@@ -33,12 +38,11 @@ class Villain {
         this.y = y;
         this.width = villainSize;
         this.height = villainSize;
-        this.color = 'red';
+        this.image = villainImage;
     }
 
     draw() {
-        ctx.fillStyle = this.color;
-        ctx.fillRect(this.x, this.y, this.width, this.height);
+        ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
     }
 }
 
@@ -83,4 +87,9 @@ function gameLoop() {
     requestAnimationFrame(gameLoop);
 }
 
-gameLoop();
+// Ensure images are loaded before starting the game loop
+heroImage.onload = function() {
+    villainImage.onload = function() {
+        gameLoop();
+    }
+};
