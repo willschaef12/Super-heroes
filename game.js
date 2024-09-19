@@ -15,6 +15,7 @@ webImg.src = 'web.png';
 // Game state
 let gameStarted = false;
 let characterSelected = null;
+let hero; // Declare hero here
 
 // Classes
 class GameObject {
@@ -89,12 +90,14 @@ canvas.addEventListener('click', (e) => {
     if (mouseX >= hero1.x && mouseX <= hero1.x + heroSize &&
         mouseY >= hero1.y && mouseY <= hero1.y + heroSize) {
         characterSelected = hero1;
+        hero = hero1; // Set the hero to the selected character
     }
 
     // Check if the Batman image was clicked
     if (mouseX >= hero2.x && mouseX <= hero2.x + heroSize &&
         mouseY >= hero2.y && mouseY <= hero2.y + heroSize) {
         characterSelected = hero2;
+        hero = hero2; // Set the hero to the selected character
     }
 });
 
