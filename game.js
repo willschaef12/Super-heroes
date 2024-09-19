@@ -9,6 +9,9 @@ const healthBarWidth = 50, healthBarHeight = 5;
 const heroImg = new Image(), villainImg = new Image(), webImg = new Image();
 heroImg.src = 'spiderman.png'; villainImg.src = 'venom.webp'; webImg.src = 'web.png';
 
+// Game state
+let gameStarted = false;
+
 // Classes
 class GameObject {
     constructor(x, y, width, height, image) {
@@ -52,35 +55,10 @@ class Villain extends GameObject {
 
     draw() {
         if (this.alive) {
-            // Only draw the villain if alive
             ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
         }
     }
 }
-
-// In the game loop, update the villain's state
-function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.font = '30px Arial';
-    ctx.fillStyle = 'black';
-    ctx.textAlign = 'center';
-    ctx.fillText('VS Venom', canvas.width / 2, 50);
-
-    hero.draw();
-
-    // Only draw the villain and its health bar if it is alive
-    if (villain.alive) {
-        villain.draw();
-        villain.drawHealthBar();
-    } else {
-        // Optional: You can display a message when the villain dies
-        ctx.fillText('Villain Defeated!', canvas.width / 2, canvas.height / 2);
-    }
-
-    webs.forEach(web => web.draw());
-}
-
-
 
 class Web extends GameObject {
     constructor(x, y, direction) { super(x, y, webSize, webSize, webImg); this.direction = direction; }
@@ -95,6 +73,15 @@ let webs = [], keys = {};
 // Input handling
 window.addEventListener('keydown', e => keys[e.code] = true);
 window.addEventListener('keyup', e => keys[e.code] = false);
+
+// Start screen
+function drawStartScreen() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.font = '30px Arial';
+    ctx.fillStyle = 'black';
+    ctx.textAlign = 'center';
+    ctx.fillText('Press Space to Start', canvas.width / 2, canvas.height / 2);
+}
 
 // Movement and shooting
 let lastShotTime = 0; // Track the last time the web was shot
@@ -128,20 +115,41 @@ function update() {
     });
 }
 
-
-// Drawing
-function draw() {
+function drawGame() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.font = '30px Arial'; ctx.fillStyle = 'black'; ctx.textAlign = 'center';
-    ctx.fillText('VS Venom', canvas.width / 2, 50); // Draw text
-    hero.draw(); villain.draw(); villain.drawHealthBar(); // Draw hero, villain, and health bar
-    webs.forEach(web => web.draw()); // Draw webs
+    ctx.fillText('VS Venom', canvas.width / 2, 50);
+    hero.draw();
+
+    if (villain.alive) {
+        villain.draw();
+        villain.drawHealthBar();
+    } else {
+        ctx.fillText('Villain Defeated!', canvas.width / 2, canvas.height / 2);
+    }
+
+    webs.forEach(web => web.draw());
 }
 
 // Game loop
 function gameLoop() {
-    update(); draw(); requestAnimationFrame(gameLoop);
+    if (gameStarted) {
+        update(); 
+        drawGame(); 
+    } else {
+        drawStartScreen();
+    }
+    requestAnimationFrame(gameLoop);
 }
 
 // Start game after images are loaded
-heroImg.onload = villainImg.onload = webImg.onload = gameLoop;
+heroImg.onload = villainImg.onload = webImg.onload = () => {
+    gameLoop();
+};
+
+// Start the game on spacebar press
+window.addEventListener('keydown', (e) => {
+    if (e.code === 'Space' && !gameStarted) {
+        gameStarted = true;
+    }
+});
