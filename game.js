@@ -20,28 +20,66 @@ class GameObject {
 class Villain extends GameObject {
     constructor(x, y, health) {
         super(x, y, villainSize, villainSize, villainImg);
-        this.maxHealth = health; // Store max health for scaling
+        this.maxHealth = health;
         this.health = health;
+        this.alive = true; // Track if the villain is alive
     }
-    
-    drawHealthBar() {
-        const barWidth = 50;  // Fixed width for health bar
-        const barHeight = 5;
-        const healthRatio = this.health / this.maxHealth; // Calculate health ratio
 
-        // Draw red background (full bar)
-        ctx.fillStyle = 'red';
-        ctx.fillRect(this.x, this.y - 10, barWidth, barHeight);
-        
-        // Draw green foreground (remaining health)
-        ctx.fillStyle = 'green';
-        ctx.fillRect(this.x, this.y - 10, barWidth * healthRatio, barHeight);
+    drawHealthBar() {
+        if (this.alive) {
+            const barWidth = 50;
+            const barHeight = 5;
+            const healthRatio = this.health / this.maxHealth;
+
+            // Draw the red background (empty health bar)
+            ctx.fillStyle = 'red';
+            ctx.fillRect(this.x, this.y - 10, barWidth, barHeight);
+
+            // Draw the green foreground (remaining health)
+            ctx.fillStyle = 'green';
+            ctx.fillRect(this.x, this.y - 10, barWidth * healthRatio, barHeight);
+        }
     }
 
     takeDamage() {
-        this.health = Math.max(0, this.health - 1); // Decrease health, ensure it doesn't go below 0
+        this.health = Math.max(0, this.health - 1); // Decrease health, but not below 0
+
+        // Check if villain's health is 0, set `alive` to false
+        if (this.health === 0) {
+            this.alive = false;
+        }
+    }
+
+    draw() {
+        if (this.alive) {
+            // Only draw the villain if alive
+            ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+        }
     }
 }
+
+// In the game loop, update the villain's state
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.font = '30px Arial';
+    ctx.fillStyle = 'black';
+    ctx.textAlign = 'center';
+    ctx.fillText('VS Venom', canvas.width / 2, 50);
+
+    hero.draw();
+
+    // Only draw the villain and its health bar if it is alive
+    if (villain.alive) {
+        villain.draw();
+        villain.drawHealthBar();
+    } else {
+        // Optional: You can display a message when the villain dies
+        ctx.fillText('Villain Defeated!', canvas.width / 2, canvas.height / 2);
+    }
+
+    webs.forEach(web => web.draw());
+}
+
 
 
 class Web extends GameObject {
