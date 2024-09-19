@@ -70,14 +70,33 @@ class Web extends GameObject {
 }
 
 // Create objects
-const hero1 = new GameObject(canvas.width / 2, canvas.height / 2, heroSize, heroSize, heroImg1);
-const hero2 = new GameObject(canvas.width / 2, canvas.height / 2, heroSize, heroSize, heroImg2);
+const hero1 = new GameObject(canvas.width / 4, canvas.height / 2, heroSize, heroSize, heroImg1);
+const hero2 = new GameObject((canvas.width * 3) / 4 - heroSize, canvas.height / 2, heroSize, heroSize, heroImg2);
 const villain = new Villain(canvas.width / 2, canvas.height / 4, 5);
 let webs = [], keys = {};
 
 // Input handling
 window.addEventListener('keydown', e => keys[e.code] = true);
 window.addEventListener('keyup', e => keys[e.code] = false);
+
+// Mouse click handling for character selection
+canvas.addEventListener('click', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+
+    // Check if the Spiderman image was clicked
+    if (mouseX >= hero1.x && mouseX <= hero1.x + heroSize &&
+        mouseY >= hero1.y && mouseY <= hero1.y + heroSize) {
+        characterSelected = hero1;
+    }
+
+    // Check if the Batman image was clicked
+    if (mouseX >= hero2.x && mouseX <= hero2.x + heroSize &&
+        mouseY >= hero2.y && mouseY <= hero2.y + heroSize) {
+        characterSelected = hero2;
+    }
+});
 
 // Start screen
 function drawStartScreen() {
@@ -96,11 +115,11 @@ function drawCharacterSelect() {
     ctx.textAlign = 'center';
     ctx.fillText('Select Your Character', canvas.width / 2, 50);
 
-    ctx.drawImage(heroImg1, canvas.width / 4, canvas.height / 2, heroSize, heroSize);
-    ctx.fillText('Press 1 for Spiderman', canvas.width / 4, canvas.height / 2 + heroSize + 20);
+    hero1.draw();
+    ctx.fillText('Click Spiderman', canvas.width / 4, canvas.height / 2 + heroSize + 20);
 
-    ctx.drawImage(heroImg2, (canvas.width * 3) / 4 - heroSize, canvas.height / 2, heroSize, heroSize);
-    ctx.fillText('Press 2 for Batman', (canvas.width * 3) / 4, canvas.height / 2 + heroSize + 20);
+    hero2.draw();
+    ctx.fillText('Click Batman', (canvas.width * 3) / 4, canvas.height / 2 + heroSize + 20);
 }
 
 // Movement and shooting
@@ -169,15 +188,9 @@ heroImg1.onload = heroImg2.onload = villainImg.onload = webImg.onload = () => {
     gameLoop();
 };
 
-// Character selection on key press
+// Start the game on spacebar press
 window.addEventListener('keydown', (e) => {
     if (e.code === 'Space' && !gameStarted && characterSelected !== null) {
         gameStarted = true;
-    }
-    if (e.code === 'Digit1' && characterSelected === null) {
-        characterSelected = hero1;
-    }
-    if (e.code === 'Digit2' && characterSelected === null) {
-        characterSelected = hero2;
     }
 });
