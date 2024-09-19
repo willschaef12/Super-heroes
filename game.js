@@ -6,11 +6,15 @@ const heroSize = 50, villainSize = 50, heroSpeed = 5, webSpeed = 10, webSize = 2
 const healthBarWidth = 50, healthBarHeight = 5;
 
 // Images
-const heroImg = new Image(), villainImg = new Image(), webImg = new Image();
-heroImg.src = 'spiderman.png'; villainImg.src = 'venom.webp'; webImg.src = 'web.png';
+const heroImg1 = new Image(), heroImg2 = new Image(), villainImg = new Image(), webImg = new Image();
+heroImg1.src = 'spiderman.png'; // Hero 1
+heroImg2.src = 'batman.png'; // Hero 2 (You can replace this with any image)
+villainImg.src = 'venom.webp'; 
+webImg.src = 'web.png';
 
 // Game state
 let gameStarted = false;
+let characterSelected = null;
 
 // Classes
 class GameObject {
@@ -66,7 +70,8 @@ class Web extends GameObject {
 }
 
 // Create objects
-const hero = new GameObject(canvas.width / 2, canvas.height / 2, heroSize, heroSize, heroImg);
+const hero1 = new GameObject(canvas.width / 2, canvas.height / 2, heroSize, heroSize, heroImg1);
+const hero2 = new GameObject(canvas.width / 2, canvas.height / 2, heroSize, heroSize, heroImg2);
 const villain = new Villain(canvas.width / 2, canvas.height / 4, 5);
 let webs = [], keys = {};
 
@@ -81,6 +86,21 @@ function drawStartScreen() {
     ctx.fillStyle = 'black';
     ctx.textAlign = 'center';
     ctx.fillText('Press Space to Start', canvas.width / 2, canvas.height / 2);
+}
+
+// Character selection screen
+function drawCharacterSelect() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.font = '30px Arial';
+    ctx.fillStyle = 'black';
+    ctx.textAlign = 'center';
+    ctx.fillText('Select Your Character', canvas.width / 2, 50);
+
+    ctx.drawImage(heroImg1, canvas.width / 4, canvas.height / 2, heroSize, heroSize);
+    ctx.fillText('Press 1 for Spiderman', canvas.width / 4, canvas.height / 2 + heroSize + 20);
+
+    ctx.drawImage(heroImg2, (canvas.width * 3) / 4 - heroSize, canvas.height / 2, heroSize, heroSize);
+    ctx.fillText('Press 2 for Batman', (canvas.width * 3) / 4, canvas.height / 2 + heroSize + 20);
 }
 
 // Movement and shooting
@@ -133,7 +153,9 @@ function drawGame() {
 
 // Game loop
 function gameLoop() {
-    if (gameStarted) {
+    if (characterSelected === null) {
+        drawCharacterSelect();
+    } else if (gameStarted) {
         update(); 
         drawGame(); 
     } else {
@@ -143,13 +165,19 @@ function gameLoop() {
 }
 
 // Start game after images are loaded
-heroImg.onload = villainImg.onload = webImg.onload = () => {
+heroImg1.onload = heroImg2.onload = villainImg.onload = webImg.onload = () => {
     gameLoop();
 };
 
-// Start the game on spacebar press
+// Character selection on key press
 window.addEventListener('keydown', (e) => {
-    if (e.code === 'Space' && !gameStarted) {
+    if (e.code === 'Space' && !gameStarted && characterSelected !== null) {
         gameStarted = true;
+    }
+    if (e.code === 'Digit1' && characterSelected === null) {
+        characterSelected = hero1;
+    }
+    if (e.code === 'Digit2' && characterSelected === null) {
+        characterSelected = hero2;
     }
 });
