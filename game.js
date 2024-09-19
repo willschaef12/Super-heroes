@@ -1,194 +1,99 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
-const heroSize = 50; // Width and height of the hero image
-const villainSize = 50; // Width and height of the villain image
-const heroSpeed = 5;
-const spiderwebSpeed = 10;
-const spiderwebSize = 20; // Size of the spiderweb image
-const healthBarWidth = 50; // Width of the health bar
-const healthBarHeight = 5; // Height of the health bar
+// Sizes and speeds
+const heroSize = 50, villainSize = 50, heroSpeed = 5, webSpeed = 10, webSize = 20;
+const healthBarWidth = 50, healthBarHeight = 5;
 
-// Load images
-const heroImage = new Image();
-const villainImage = new Image();
-const spiderwebImage = new Image();
+// Images
+const heroImg = new Image(), villainImg = new Image(), webImg = new Image();
+heroImg.src = 'spiderman.png'; villainImg.src = 'venom.webp'; webImg.src = 'web.png';
 
-heroImage.src = 'spiderman.png'; // Path to your Spiderman image
-villainImage.src = 'venom.webp'; // Path to your Venom image
-spiderwebImage.src = 'web.png'; // Path to your spiderweb image
-
-// Define Spiderweb class
-class Spiderweb {
-    constructor(x, y, direction) {
-        this.x = x;
-        this.y = y;
-        this.direction = direction; // Direction of the web
-        this.width = spiderwebSize;
-        this.height = spiderwebSize;
+// Classes
+class GameObject {
+    constructor(x, y, width, height, image) {
+        this.x = x; this.y = y; this.width = width; this.height = height; this.image = image;
     }
-
-    draw() {
-        ctx.drawImage(spiderwebImage, this.x, this.y, this.width, this.height);
-    }
-
-    update() {
-        // Move the spiderweb based on its direction
-        this.x += spiderwebSpeed * Math.cos(this.direction);
-        this.y += spiderwebSpeed * Math.sin(this.direction);
-    }
+    draw() { ctx.drawImage(this.image, this.x, this.y, this.width, this.height); }
 }
 
-// Define Hero class
-class Hero {
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
-        this.width = heroSize;
-        this.height = heroSize;
-    }
-
-    draw() {
-        ctx.drawImage(heroImage, this.x, this.y, this.width, this.height);
-    }
-
-    move(dx, dy) {
-        this.x += dx;
-        this.y += dy;
-    }
-}
-
-// Define Villain class with health and health bar
-class Villain {
-    constructor(x, y, health = 3) { // Villain starts with 3 health points
-        this.x = x;
-        this.y = y;
-        this.width = villainSize;
-        this.height = villainSize;
-        this.maxHealth = health;
+class Villain extends GameObject {
+    constructor(x, y, health) {
+        super(x, y, villainSize, villainSize, villainImg);
+        this.maxHealth = health; // Store max health for scaling
         this.health = health;
     }
-
-    draw() {
-        if (this.health > 0) {
-            ctx.drawImage(villainImage, this.x, this.y, this.width, this.height);
-            this.drawHealthBar(); // Draw health bar above villain
-        }
-    }
-
+    
     drawHealthBar() {
-        const healthRatio = this.health / this.maxHealth; // Ratio of remaining health
-        const barWidth = healthBarWidth * healthRatio; // Adjust width based on health
+        const barWidth = 50;  // Fixed width for health bar
+        const barHeight = 5;
+        const healthRatio = this.health / this.maxHealth; // Calculate health ratio
 
-        // Draw background (full health bar, in red)
+        // Draw red background (full bar)
         ctx.fillStyle = 'red';
-        ctx.fillRect(this.x, this.y - 10, healthBarWidth, healthBarHeight);
-
-        // Draw current health (in green)
+        ctx.fillRect(this.x, this.y - 10, barWidth, barHeight);
+        
+        // Draw green foreground (remaining health)
         ctx.fillStyle = 'green';
-        ctx.fillRect(this.x, this.y - 10, barWidth, healthBarHeight);
+        ctx.fillRect(this.x, this.y - 10, barWidth * healthRatio, barHeight);
     }
 
     takeDamage() {
-        this.health -= 1;
-        console.log('Villain hit! Health:', this.health);
-        if (this.health <= 0) {
-            console.log('Villain defeated!');
-        }
+        this.health = Math.max(0, this.health - 1); // Decrease health, ensure it doesn't go below 0
     }
 }
 
-// Create instances
-const hero = new Hero(canvas.width / 2 - heroSize / 2, canvas.height / 2 - heroSize / 2);
-const villain = new Villain(canvas.width / 2 - villainSize / 2, canvas.height / 4, 5); // Villain starts with 5 health
-let spiderwebs = []; // Initialize spiderwebs array
 
-// Handle keyboard input
-const keys = {};
-let shootingDirection = 0;
-
-window.addEventListener('keydown', (event) => {
-    keys[event.code] = true;
-
-    if (event.code === 'Space') {
-        // Calculate the shooting direction based on the hero's current facing direction
-        shootingDirection = Math.atan2(keys['ArrowDown'] ? 1 : keys['ArrowUp'] ? -1 : 0, keys['ArrowRight'] ? 1 : keys['ArrowLeft'] ? -1 : 0);
-        spiderwebs.push(new Spiderweb(hero.x + heroSize / 2 - spiderwebSize / 2, hero.y + heroSize / 2 - spiderwebSize / 2, shootingDirection));
-    }
-});
-
-window.addEventListener('keyup', (event) => {
-    keys[event.code] = false;
-});
-
-// Collision detection function
-function isColliding(a, b) {
-    return (
-        a.x < b.x + b.width &&
-        a.x + a.width > b.x &&
-        a.y < b.y + b.height &&
-        a.y + a.height > b.y
-    );
+class Web extends GameObject {
+    constructor(x, y, direction) { super(x, y, webSize, webSize, webImg); this.direction = direction; }
+    update() { this.x += webSpeed * Math.cos(this.direction); this.y += webSpeed * Math.sin(this.direction); }
 }
 
+// Create objects
+const hero = new GameObject(canvas.width / 2, canvas.height / 2, heroSize, heroSize, heroImg);
+const villain = new Villain(canvas.width / 2, canvas.height / 4, 5);
+let webs = [], keys = {};
+
+// Input handling
+window.addEventListener('keydown', e => keys[e.code] = true);
+window.addEventListener('keyup', e => keys[e.code] = false);
+
+// Movement and shooting
 function update() {
-    // Movement logic
-    let dx = 0;
-    let dy = 0;
+    if (keys['ArrowUp']) hero.y -= heroSpeed;
+    if (keys['ArrowDown']) hero.y += heroSpeed;
+    if (keys['ArrowLeft']) hero.x -= heroSpeed;
+    if (keys['ArrowRight']) hero.x += heroSpeed;
+    if (keys['Space']) {
+        let dir = Math.atan2(keys['ArrowDown'] ? 1 : keys['ArrowUp'] ? -1 : 0, keys['ArrowRight'] ? 1 : keys['ArrowLeft'] ? -1 : 0);
+        webs.push(new Web(hero.x + heroSize / 2, hero.y + heroSize / 2, dir));
+    }
+    webs.forEach(web => web.update());
+    webs = webs.filter(web => web.x >= 0 && web.x <= canvas.width && web.y >= 0 && web.y <= canvas.height);
 
-    if (keys['ArrowUp']) dy = -heroSpeed;
-    if (keys['ArrowDown']) dy = heroSpeed;
-    if (keys['ArrowLeft']) dx = -heroSpeed;
-    if (keys['ArrowRight']) dx = heroSpeed;
-
-    hero.move(dx, dy);
-
-    // Update spiderwebs
-    spiderwebs.forEach(web => {
-        web.update();
-
-        // Check for collision with the villain
-        if (villain.health > 0 && isColliding(web, villain)) {
+    // Collision detection
+    webs.forEach((web, i) => {
+        if (web.x < villain.x + villain.width && web.x + web.width > villain.x &&
+            web.y < villain.y + villain.height && web.y + web.height > villain.y) {
             villain.takeDamage();
-            // Remove the spiderweb after it hits the villain
-            spiderwebs = spiderwebs.filter(sw => sw !== web);
+            webs.splice(i, 1); // Remove web on collision
         }
     });
-
-    // Remove spiderwebs that are off-screen
-    spiderwebs = spiderwebs.filter(web => web.x >= 0 && web.x <= canvas.width && web.y >= 0 && web.y <= canvas.height);
 }
 
-function drawText() {
-    // Draw "VS Venom" text on the screen
-    ctx.font = '30px Arial'; // Font size and style
-    ctx.fillStyle = 'black'; // Text color
-    ctx.textAlign = 'center'; // Align text to the center
-    ctx.fillText('VS Venom', canvas.width / 2, 50); // Position the text
-}
-
+// Drawing
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    drawText(); // Draw "VS Venom" text at the top of the screen
-    hero.draw();
-    villain.draw(); // Villain now has a health bar
-    spiderwebs.forEach(web => {
-        web.draw();
-    });
+    ctx.font = '30px Arial'; ctx.fillStyle = 'black'; ctx.textAlign = 'center';
+    ctx.fillText('VS Venom', canvas.width / 2, 50); // Draw text
+    hero.draw(); villain.draw(); villain.drawHealthBar(); // Draw hero, villain, and health bar
+    webs.forEach(web => web.draw()); // Draw webs
 }
 
+// Game loop
 function gameLoop() {
-    update();
-    draw();
-    requestAnimationFrame(gameLoop);
+    update(); draw(); requestAnimationFrame(gameLoop);
 }
 
-// Start the game loop after images have loaded
-heroImage.onload = () => {
-    villainImage.onload = () => {
-        spiderwebImage.onload = () => {
-            gameLoop();
-        };
-    };
-};
+// Start game after images are loaded
+heroImg.onload = villainImg.onload = webImg.onload = gameLoop;
