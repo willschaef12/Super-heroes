@@ -59,27 +59,37 @@ window.addEventListener('keydown', e => keys[e.code] = true);
 window.addEventListener('keyup', e => keys[e.code] = false);
 
 // Movement and shooting
+let lastShotTime = 0; // Track the last time the web was shot
+const webCooldown = 300; // Cooldown period in milliseconds (0.3 seconds)
+
 function update() {
+    let currentTime = Date.now(); // Get the current time
+
     if (keys['ArrowUp']) hero.y -= heroSpeed;
     if (keys['ArrowDown']) hero.y += heroSpeed;
     if (keys['ArrowLeft']) hero.x -= heroSpeed;
     if (keys['ArrowRight']) hero.x += heroSpeed;
-    if (keys['Space']) {
+
+    // Only shoot if enough time has passed since the last shot
+    if (keys['Space'] && currentTime - lastShotTime > webCooldown) {
         let dir = Math.atan2(keys['ArrowDown'] ? 1 : keys['ArrowUp'] ? -1 : 0, keys['ArrowRight'] ? 1 : keys['ArrowLeft'] ? -1 : 0);
         webs.push(new Web(hero.x + heroSize / 2, hero.y + heroSize / 2, dir));
+        lastShotTime = currentTime; // Update the last shot time
     }
+
     webs.forEach(web => web.update());
     webs = webs.filter(web => web.x >= 0 && web.x <= canvas.width && web.y >= 0 && web.y <= canvas.height);
 
-    // Collision detection
+    // Collision detection with the villain
     webs.forEach((web, i) => {
         if (web.x < villain.x + villain.width && web.x + web.width > villain.x &&
             web.y < villain.y + villain.height && web.y + web.height > villain.y) {
             villain.takeDamage();
-            webs.splice(i, 1); // Remove web on collision
+            webs.splice(i, 1); // Remove the web upon collision
         }
     });
 }
+
 
 // Drawing
 function draw() {
