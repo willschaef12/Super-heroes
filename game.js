@@ -116,13 +116,19 @@ function drawStartScreen() {
 // Character selection screen
 function drawCharacterSelect() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.font = '30px Arial';
-    ctx.fillStyle = 'black';
-    ctx.textAlign = 'center';
-    ctx.fillText('Select Your Character', canvas.width / 2, 50);
 
-    // Text above the Spiderman image
+    // Graffiti-like Spiderman text
+    ctx.font = 'bold 40px "Comic Sans MS", cursive, sans-serif'; // Graffiti-like font
+    ctx.fillStyle = 'red'; // Base color
+    ctx.textAlign = 'center';
+    ctx.shadowColor = 'black'; // Shadow color
+    ctx.shadowBlur = 10; // Blurred shadow for depth
+    ctx.shadowOffsetX = 5; // Horizontal shadow offset
+    ctx.shadowOffsetY = 5; // Vertical shadow offset
     ctx.fillText('Spiderman', canvas.width / 4, hero1.y - 20); // Position the text above Spiderman
+
+    // Reset shadow for other elements
+    ctx.shadowColor = 'transparent';
 
     // Draw a border around the Spiderman selection image (always present)
     ctx.strokeStyle = 'red'; // Set border color
@@ -136,7 +142,7 @@ function drawCharacterSelect() {
     hero2.draw();
     ctx.fillText('Click Batman', (canvas.width * 3) / 4, canvas.height / 2 + heroSize + 20);
 }
-
+ 
 
 
 // Movement and shooting
