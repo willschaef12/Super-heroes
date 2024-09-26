@@ -4,13 +4,12 @@ const ctx = canvas.getContext('2d');
 // Sizes and speeds
 const heroSize = 50, villainSize = 50, heroSpeed = 5, webSpeed = 10, webSize = 20;
 const healthBarWidth = 50, healthBarHeight = 5;
-const largerHeroSize = 100; // Increase size for Spiderman image during selection
 
 // Images
 const heroImg1 = new Image(), heroImg2 = new Image(), villainImg = new Image(), webImg = new Image();
 const heroSelectImg1 = new Image(); // New image for selecting Spiderman
 heroImg1.src = 'spiderman.png'; // Hero 1
-heroSelectImg1.src = 'spiderman2.webp'; // Larger selection image for Spiderman
+heroSelectImg1.src = 'spiderman2.webp'; // New selection image for Spiderman
 heroImg2.src = 'batman.png'; // Hero 2 (You can replace this with any image)
 villainImg.src = 'venom.webp'; 
 webImg.src = 'web.png';
@@ -19,6 +18,12 @@ webImg.src = 'web.png';
 let gameStarted = false;
 let characterSelected = null;
 let hero; // Declare hero here
+
+// Load the custom font dynamically
+const link = document.createElement('link');
+link.href = 'https://fonts.googleapis.com/css2?family=Sedgwick+Ave&display=swap'; // Sedgwick Ave font
+link.rel = 'stylesheet';
+document.head.appendChild(link);
 
 // Classes
 class GameObject {
@@ -69,12 +74,18 @@ class Villain extends GameObject {
 }
 
 class Web extends GameObject {
-    constructor(x, y, direction) { super(x, y, webSize, webSize, webImg); this.direction = direction; }
-    update() { this.x += webSpeed * Math.cos(this.direction); this.y += webSpeed * Math.sin(this.direction); }
+    constructor(x, y, direction) { 
+        super(x, y, webSize, webSize, webImg); 
+        this.direction = direction; 
+    }
+    update() { 
+        this.x += webSpeed * Math.cos(this.direction); 
+        this.y += webSpeed * Math.sin(this.direction); 
+    }
 }
 
 // Create objects
-const hero1 = new GameObject(canvas.width / 5, canvas.height / 2, heroSize, heroSize, heroImg1);
+const hero1 = new GameObject(canvas.width / 4, canvas.height / 2, heroSize, heroSize, heroImg1);
 const hero2 = new GameObject((canvas.width * 3) / 4 - heroSize, canvas.height / 2, heroSize, heroSize, heroImg2);
 const villain = new Villain(canvas.width / 2, canvas.height / 4, 5);
 let webs = [], keys = {};
@@ -116,9 +127,7 @@ function drawStartScreen() {
 // Character selection screen
 function drawCharacterSelect() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Graffiti-like Spiderman text
-    ctx.font = 'bold 40px "Comic Sans MS", cursive, sans-serif'; // Graffiti-like font
+    ctx.font = 'bold 50px "Sedgwick Ave", cursive'; // Using Sedgwick Ave font
     ctx.fillStyle = 'red'; // Base color
     ctx.textAlign = 'center';
     ctx.shadowColor = 'black'; // Shadow color
@@ -133,17 +142,15 @@ function drawCharacterSelect() {
     // Draw a border around the Spiderman selection image (always present)
     ctx.strokeStyle = 'red'; // Set border color
     ctx.lineWidth = 5; // Set border width
-    ctx.strokeRect(hero1.x, hero1.y, largerHeroSize, largerHeroSize); // Draw the border around the Spiderman image
+    ctx.strokeRect(hero1.x, hero1.y, heroSize, heroSize); // Draw the border around the Spiderman image
 
-    // Draw the Spiderman image with the larger size
-    ctx.drawImage(heroSelectImg1, hero1.x, hero1.y, largerHeroSize, largerHeroSize);
+    // Draw the Spiderman image with the original size
+    ctx.drawImage(heroSelectImg1, hero1.x, hero1.y, heroSize, heroSize);
 
     // Batman selection
+    ctx.fillText('Batman', (canvas.width * 3) / 4, hero2.y - 20); // Position Batman text above the image
     hero2.draw();
-    ctx.fillText('Click Batman', (canvas.width * 3) / 4, canvas.height / 2 + heroSize + 20);
 }
- 
-
 
 // Movement and shooting
 let lastShotTime = 0; // Track the last time the web was shot
@@ -199,7 +206,7 @@ function gameLoop() {
         drawCharacterSelect();
     } else if (gameStarted) {
         update(); 
-        drawGame(); 
+        drawGame();
     } else {
         drawStartScreen();
     }
