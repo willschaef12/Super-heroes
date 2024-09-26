@@ -121,6 +121,9 @@ function drawCharacterSelect() {
     ctx.textAlign = 'center';
     ctx.fillText('Select Your Character', canvas.width / 2, 50);
 
+    // Text above the Spiderman image
+    ctx.fillText('Spiderman', canvas.width / 4, hero1.y - 20); // Position the text above Spiderman
+
     // Draw a border around the Spiderman selection image (always present)
     ctx.strokeStyle = 'red'; // Set border color
     ctx.lineWidth = 5; // Set border width
@@ -129,9 +132,11 @@ function drawCharacterSelect() {
     // Draw the Spiderman image with the larger size
     ctx.drawImage(heroSelectImg1, hero1.x, hero1.y, largerHeroSize, largerHeroSize);
 
+    // Batman selection
     hero2.draw();
     ctx.fillText('Click Batman', (canvas.width * 3) / 4, canvas.height / 2 + heroSize + 20);
 }
+
 
 
 // Movement and shooting
