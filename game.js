@@ -74,7 +74,7 @@ class Web extends GameObject {
 }
 
 // Create objects
-const hero1 = new GameObject(canvas.width / 4, canvas.height / 2, heroSize, heroSize, heroImg1);
+const hero1 = new GameObject(canvas.width / 5, canvas.height / 2, heroSize, heroSize, heroImg1);
 const hero2 = new GameObject((canvas.width * 3) / 4 - heroSize, canvas.height / 2, heroSize, heroSize, heroImg2);
 const villain = new Villain(canvas.width / 2, canvas.height / 4, 5);
 let webs = [], keys = {};
