@@ -121,12 +121,18 @@ function drawCharacterSelect() {
     ctx.textAlign = 'center';
     ctx.fillText('Select Your Character', canvas.width / 2, 50);
 
-    ctx.drawImage(heroSelectImg1, hero1.x, hero1.y, largerHeroSize, largerHeroSize); // Use the larger image for Spiderman
-    ctx.fillText('Click Spiderman', canvas.width / 4, canvas.height / 2 + largerHeroSize + 20);
+    // Draw a border around the Spiderman selection image (always present)
+    ctx.strokeStyle = 'red'; // Set border color
+    ctx.lineWidth = 5; // Set border width
+    ctx.strokeRect(hero1.x, hero1.y, largerHeroSize, largerHeroSize); // Draw the border around the Spiderman image
+
+    // Draw the Spiderman image with the larger size
+    ctx.drawImage(heroSelectImg1, hero1.x, hero1.y, largerHeroSize, largerHeroSize);
 
     hero2.draw();
     ctx.fillText('Click Batman', (canvas.width * 3) / 4, canvas.height / 2 + heroSize + 20);
 }
+
 
 // Movement and shooting
 let lastShotTime = 0; // Track the last time the web was shot
