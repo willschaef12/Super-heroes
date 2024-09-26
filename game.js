@@ -4,10 +4,13 @@ const ctx = canvas.getContext('2d');
 // Sizes and speeds
 const heroSize = 50, villainSize = 50, heroSpeed = 5, webSpeed = 10, webSize = 20;
 const healthBarWidth = 50, healthBarHeight = 5;
+const largerHeroSize = 100; // Increase size for Spiderman image during selection
 
 // Images
 const heroImg1 = new Image(), heroImg2 = new Image(), villainImg = new Image(), webImg = new Image();
+const heroSelectImg1 = new Image(); // New image for selecting Spiderman
 heroImg1.src = 'spiderman.png'; // Hero 1
+heroSelectImg1.src = 'spiderman2.webp'; // Larger selection image for Spiderman
 heroImg2.src = 'batman.png'; // Hero 2 (You can replace this with any image)
 villainImg.src = 'venom.webp'; 
 webImg.src = 'web.png';
@@ -118,8 +121,8 @@ function drawCharacterSelect() {
     ctx.textAlign = 'center';
     ctx.fillText('Select Your Character', canvas.width / 2, 50);
 
-    hero1.draw();
-    ctx.fillText('Click Spiderman', canvas.width / 4, canvas.height / 2 + heroSize + 20);
+    ctx.drawImage(heroSelectImg1, hero1.x, hero1.y, largerHeroSize, largerHeroSize); // Use the larger image for Spiderman
+    ctx.fillText('Click Spiderman', canvas.width / 4, canvas.height / 2 + largerHeroSize + 20);
 
     hero2.draw();
     ctx.fillText('Click Batman', (canvas.width * 3) / 4, canvas.height / 2 + heroSize + 20);
@@ -187,7 +190,7 @@ function gameLoop() {
 }
 
 // Start game after images are loaded
-heroImg1.onload = heroImg2.onload = villainImg.onload = webImg.onload = () => {
+heroImg1.onload = heroImg2.onload = villainImg.onload = webImg.onload = heroSelectImg1.onload = () => {
     gameLoop();
 };
 
