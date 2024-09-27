@@ -7,10 +7,11 @@ const healthBarWidth = 50, healthBarHeight = 5;
 
 // Images
 const heroImg1 = new Image(), heroImg2 = new Image(), villainImg = new Image(), webImg = new Image();
-const heroSelectImg1 = new Image(); // New image for selecting Spiderman
+const heroSelectImg1 = new Image(), heroSelectImg2 = new Image(); // New images for selecting characters
 heroImg1.src = 'spiderman.png'; // Hero 1
 heroSelectImg1.src = 'spiderman2.webp'; // New selection image for Spiderman
 heroImg2.src = 'batman.png'; // Hero 2 (You can replace this with any image)
+heroSelectImg2.src = 'batman.webp'; // New selection image for Batman
 villainImg.src = 'venom.webp'; 
 webImg.src = 'web.png';
 
@@ -125,7 +126,6 @@ function drawStartScreen() {
 }
 
 // Character selection screen
-// Character selection screen
 function drawCharacterSelect() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.font = 'bold 50px "Sedgwick Ave", cursive'; // Using Sedgwick Ave font
@@ -151,9 +151,8 @@ function drawCharacterSelect() {
     // Batman selection
     ctx.fillStyle = 'black'; // Change color for Batman text to black
     ctx.fillText('Batman', (canvas.width * 3) / 4, hero2.y - 20); // Position Batman text above the image
-    hero2.draw();
+    ctx.drawImage(heroSelectImg2, hero2.x, hero2.y, heroSize, heroSize); // Draw Batman selection image
 }
-
 
 // Movement and shooting
 let lastShotTime = 0; // Track the last time the web was shot
@@ -209,7 +208,7 @@ function gameLoop() {
         drawCharacterSelect();
     } else if (gameStarted) {
         update(); 
-        drawGame();
+        drawGame(); 
     } else {
         drawStartScreen();
     }
@@ -217,13 +216,16 @@ function gameLoop() {
 }
 
 // Start game after images are loaded
-heroImg1.onload = heroImg2.onload = villainImg.onload = webImg.onload = heroSelectImg1.onload = () => {
+heroImg1.onload = heroImg2.onload = villainImg.onload = webImg.onload = heroSelectImg1.onload = heroSelectImg2.onload = () => {
     gameLoop();
 };
 
 // Start the game on spacebar press
 window.addEventListener('keydown', (e) => {
     if (e.code === 'Space' && !gameStarted && characterSelected !== null) {
-        gameStarted = true;
+        gameStarted = true; // Set game to started
     }
 });
+
+// Start the game loop
+gameLoop();
