@@ -87,7 +87,7 @@ class Web extends GameObject {
 
 // Create objects
 const hero1 = new GameObject(canvas.width / 4, canvas.height / 2, heroSize, heroSize, heroImg1);
-const hero2 = new GameObject((canvas.width * 3) / 4 - heroSize, canvas.height / 2, heroSize, heroSize, heroImg2);
+const hero2 = new GameObject((canvas.width * 3) / 4 - heroSize, canvas.height / 2, heroSize * 1.5, heroSize * 1.5, heroImg2); // Wider and taller for Batman
 const villain = new Villain(canvas.width / 2, canvas.height / 4, 5);
 let webs = [], keys = {};
 
@@ -109,8 +109,8 @@ canvas.addEventListener('click', (e) => {
     }
 
     // Check if the Batman image was clicked
-    if (mouseX >= hero2.x && mouseX <= hero2.x + heroSize &&
-        mouseY >= hero2.y && mouseY <= hero2.y + heroSize) {
+    if (mouseX >= hero2.x && mouseX <= hero2.x + hero2.width &&
+        mouseY >= hero2.y && mouseY <= hero2.y + hero2.height) {
         characterSelected = hero2;
         hero = hero2; // Set the hero to the selected character
     }
@@ -151,7 +151,13 @@ function drawCharacterSelect() {
     // Batman selection
     ctx.fillStyle = 'black'; // Change color for Batman text to black
     ctx.fillText('Batman', (canvas.width * 3) / 4, hero2.y - 20); // Position Batman text above the image
-    ctx.drawImage(heroSelectImg2, hero2.x, hero2.y, heroSize, heroSize); // Draw Batman selection image
+    
+    // Draw a black border around the Batman selection image
+    ctx.strokeStyle = 'black'; // Set border color for Batman
+    ctx.lineWidth = 5; // Set border width for Batman
+    ctx.strokeRect(hero2.x, hero2.y, heroSize * 1.5, heroSize * 1.5); // Draw the border around Batman image
+
+    ctx.drawImage(heroSelectImg2, hero2.x, hero2.y, heroSize * 1.5, heroSize * 1.5); // Draw Batman selection image
 }
 
 // Movement and shooting
