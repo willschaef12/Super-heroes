@@ -125,10 +125,11 @@ function drawStartScreen() {
 }
 
 // Character selection screen
+// Character selection screen
 function drawCharacterSelect() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.font = 'bold 50px "Sedgwick Ave", cursive'; // Using Sedgwick Ave font
-    ctx.fillStyle = 'red'; // Base color
+    ctx.fillStyle = 'red'; // Base color for Spiderman
     ctx.textAlign = 'center';
     ctx.shadowColor = 'black'; // Shadow color
     ctx.shadowBlur = 10; // Blurred shadow for depth
@@ -148,9 +149,11 @@ function drawCharacterSelect() {
     ctx.drawImage(heroSelectImg1, hero1.x, hero1.y, heroSize, heroSize);
 
     // Batman selection
+    ctx.fillStyle = 'black'; // Change color for Batman text to black
     ctx.fillText('Batman', (canvas.width * 3) / 4, hero2.y - 20); // Position Batman text above the image
     hero2.draw();
 }
+
 
 // Movement and shooting
 let lastShotTime = 0; // Track the last time the web was shot
