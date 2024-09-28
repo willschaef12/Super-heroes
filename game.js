@@ -143,16 +143,19 @@ function drawSuitSelect() {
     ctx.fillText('Select Your Suit', canvas.width / 2, canvas.height / 4);
 
     const suits = ['Suit One', 'Suit Two', 'Suit Three', 'Suit Four'];
+    const suitBoxSize = 80; // Reduced the box size to create more space
+    const suitTextYOffset = 110; // Text offset to avoid cutting off text
+
     suits.forEach((suit, index) => {
-        const x = (canvas.width / 4) * (index + 1) - 50;
+        const x = (canvas.width / 5) * (index + 1) - 60; // Adjust spacing between boxes
         const y = canvas.height / 2;
 
         ctx.fillStyle = 'gray';
-        ctx.fillRect(x, y, 100, 100);
+        ctx.fillRect(x, y, suitBoxSize, suitBoxSize);
 
         ctx.font = '20px "Sedgwick Ave", cursive';
         ctx.fillStyle = 'black';
-        ctx.fillText(suit, x + 50, y + 130);
+        ctx.fillText(suit, x + suitBoxSize / 2, y + suitTextYOffset);
     });
 }
 
