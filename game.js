@@ -8,16 +8,26 @@ const healthBarWidth = 50, healthBarHeight = 5;
 // Images
 const heroImg1 = new Image(), heroImg2 = new Image(), villainImg = new Image(), webImg = new Image();
 const heroSelectImg1 = new Image(), heroSelectImg2 = new Image(); // New images for selecting characters
+const spidermanSuit1 = new Image(), spidermanSuit2 = new Image(); // Suits for Spider-Man
+const batmanSuit1 = new Image(), batmanSuit2 = new Image(); // Suits for Batman
+
+// Load images
 heroImg1.src = 'spiderman.png'; // Hero 1
 heroSelectImg1.src = 'spiderman2.webp'; // New selection image for Spiderman
 heroImg2.src = 'batman.png'; // Hero 2 (You can replace this with any image)
-heroSelectImg2.src = 'batman.webp'; // New selection image for Batman
+heroSelectImg2.src = 'batman_select.webp'; // New selection image for Batman
 villainImg.src = 'venom.webp'; 
 webImg.src = 'web.png';
+
+spidermanSuit1.src = 'spiderman_suit1.png'; // Spider-Man Suit 1
+spidermanSuit2.src = 'spiderman_suit2.png'; // Spider-Man Suit 2
+batmanSuit1.src = 'batman_suit1.png'; // Batman Suit 1
+batmanSuit2.src = 'batman_suit2.png'; // Batman Suit 2
 
 // Game state
 let gameStarted = false;
 let characterSelected = null;
+let suitSelected = null; // New variable to track the selected suit
 let hero; // Declare hero here
 
 // Load the custom font dynamically
@@ -106,6 +116,7 @@ canvas.addEventListener('click', (e) => {
         mouseY >= hero1.y && mouseY <= hero1.y + heroSize) {
         characterSelected = hero1;
         hero = hero1; // Set the hero to the selected character
+        suitSelected = null; // Reset suit selection
     }
 
     // Check if the Batman image was clicked
@@ -113,6 +124,7 @@ canvas.addEventListener('click', (e) => {
         mouseY >= hero2.y && mouseY <= hero2.y + hero2.height) {
         characterSelected = hero2;
         hero = hero2; // Set the hero to the selected character
+        suitSelected = null; // Reset suit selection
     }
 });
 
@@ -123,6 +135,23 @@ function drawStartScreen() {
     ctx.fillStyle = 'black';
     ctx.textAlign = 'center';
     ctx.fillText('Press Space to Start', canvas.width / 2, canvas.height / 2);
+}
+
+// Suit selection screen
+function drawSuitSelect() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.font = '30px "Sedgwick Ave", cursive';
+    ctx.fillStyle = 'black';
+    ctx.textAlign = 'center';
+    ctx.fillText('Select Your Suit', canvas.width / 2, 50);
+
+    if (hero === hero1) { // Spider-Man selected
+        ctx.drawImage(spidermanSuit1, canvas.width / 4, canvas.height / 2, heroSize, heroSize);
+        ctx.drawImage(spidermanSuit2, canvas.width / 2, canvas.height / 2, heroSize, heroSize);
+    } else { // Batman selected
+        ctx.drawImage(batmanSuit1, canvas.width / 4, canvas.height / 2, heroSize, heroSize);
+        ctx.drawImage(batmanSuit2, canvas.width / 2, canvas.height / 2, heroSize, heroSize);
+    }
 }
 
 // Character selection screen
@@ -154,84 +183,4 @@ function drawCharacterSelect() {
     
     // Draw a black border around the Batman selection image
     ctx.strokeStyle = 'black'; // Set border color for Batman
-    ctx.lineWidth = 5; // Set border width for Batman
-    ctx.strokeRect(hero2.x, hero2.y, heroSize * 1.5, heroSize * 1.5); // Draw the border around Batman image
-
-    ctx.drawImage(heroSelectImg2, hero2.x, hero2.y, heroSize * 1.5, heroSize * 1.5); // Draw Batman selection image
-}
-
-// Movement and shooting
-let lastShotTime = 0; // Track the last time the web was shot
-const webCooldown = 300; // Cooldown period in milliseconds (0.3 seconds)
-
-function update() {
-    let currentTime = Date.now(); // Get the current time
-
-    if (keys['ArrowUp']) hero.y -= heroSpeed;
-    if (keys['ArrowDown']) hero.y += heroSpeed;
-    if (keys['ArrowLeft']) hero.x -= heroSpeed;
-    if (keys['ArrowRight']) hero.x += heroSpeed;
-
-    // Only shoot if enough time has passed since the last shot
-    if (keys['Space'] && currentTime - lastShotTime > webCooldown) {
-        let dir = Math.atan2(keys['ArrowDown'] ? 1 : keys['ArrowUp'] ? -1 : 0, keys['ArrowRight'] ? 1 : keys['ArrowLeft'] ? -1 : 0);
-        webs.push(new Web(hero.x + heroSize / 2, hero.y + heroSize / 2, dir));
-        lastShotTime = currentTime; // Update the last shot time
-    }
-
-    webs.forEach(web => web.update());
-    webs = webs.filter(web => web.x >= 0 && web.x <= canvas.width && web.y >= 0 && web.y <= canvas.height);
-
-    // Collision detection with the villain
-    webs.forEach((web, i) => {
-        if (web.x < villain.x + villain.width && web.x + web.width > villain.x &&
-            web.y < villain.y + villain.height && web.y + web.height > villain.y) {
-            villain.takeDamage();
-            webs.splice(i, 1); // Remove the web upon collision
-        }
-    });
-}
-
-function drawGame() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.font = '30px Arial'; ctx.fillStyle = 'black'; ctx.textAlign = 'center';
-    ctx.fillText('VS Venom', canvas.width / 2, 50);
-    hero.draw();
-
-    if (villain.alive) {
-        villain.draw();
-        villain.drawHealthBar();
-    } else {
-        ctx.fillText('Villain Defeated!', canvas.width / 2, canvas.height / 2);
-    }
-
-    webs.forEach(web => web.draw());
-}
-
-// Game loop
-function gameLoop() {
-    if (characterSelected === null) {
-        drawCharacterSelect();
-    } else if (gameStarted) {
-        update(); 
-        drawGame(); 
-    } else {
-        drawStartScreen();
-    }
-    requestAnimationFrame(gameLoop);
-}
-
-// Start game after images are loaded
-heroImg1.onload = heroImg2.onload = villainImg.onload = webImg.onload = heroSelectImg1.onload = heroSelectImg2.onload = () => {
-    gameLoop();
-};
-
-// Start the game on spacebar press
-window.addEventListener('keydown', (e) => {
-    if (e.code === 'Space' && !gameStarted && characterSelected !== null) {
-        gameStarted = true; // Set game to started
-    }
-});
-
-// Start the game loop
-gameLoop();
+    ctx.lineWidth = 5
