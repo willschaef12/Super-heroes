@@ -8,12 +8,17 @@ const healthBarWidth = 50, healthBarHeight = 5;
 // Images
 const heroImg1 = new Image(), heroImg2 = new Image(), villainImg = new Image(), webImg = new Image();
 const heroSelectImg1 = new Image(), heroSelectImg2 = new Image(); // Character selection images
+const suitOneImg = new Image(); // New image for Suit One
+
 heroImg1.src = 'spiderman.png'; // Hero 1 (Spiderman)
 heroSelectImg1.src = 'spiderman2.webp'; // Selection image for Spiderman
 heroImg2.src = 'batman.png'; // Hero 2 (Batman)
 heroSelectImg2.src = 'batman.webp'; // Selection image for Batman
 villainImg.src = 'venom.webp'; 
 webImg.src = 'web.png';
+
+// Load the Suit One image
+suitOneImg.src = 'suit1.png'; // Add the actual image URL for Suit One
 
 // Game state
 let gameStarted = false;
@@ -46,63 +51,44 @@ class Villain extends GameObject {
         super(x, y, villainSize, villainSize, villainImg);
         this.maxHealth = health;
         this.health = health;
-        this.alive = true;
+        this.alive = true; // Track if the villain is alive
     }
 
     drawHealthBar() {
         if (this.alive) {
+            const barWidth = 50;
+            const barHeight = 5;
             const healthRatio = this.health / this.maxHealth;
+
+            // Draw the red background (empty health bar)
             ctx.fillStyle = 'red';
-            ctx.fillRect(this.x, this.y - 10, healthBarWidth, healthBarHeight);
+            ctx.fillRect(this.x, this.y - 10, barWidth, barHeight);
+
+            // Draw the green foreground (remaining health)
             ctx.fillStyle = 'green';
-            ctx.fillRect(this.x, this.y - 10, healthBarWidth * healthRatio, healthBarHeight);
+            ctx.fillRect(this.x, this.y - 10, barWidth * healthRatio, barHeight);
         }
     }
 
     takeDamage() {
-        this.health = Math.max(0, this.health - 1);
+        this.health = Math.max(0, this.health - 1); // Decrease health, but not below 0
+
+        // Check if villain's health is 0, set `alive` to false
         if (this.health === 0) {
             this.alive = false;
         }
     }
-}
 
-class Web extends GameObject {
-    constructor(x, y, direction) {
-        super(x, y, webSize, webSize, webImg);
-        this.direction = direction;
-    }
-    update() {
-        this.x += webSpeed * Math.cos(this.direction);
-        this.y += webSpeed * Math.sin(this.direction);
+    draw() {
+        if (this.alive) {
+            ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+        }
     }
 }
 
-// Create objects
-const hero1 = new GameObject(canvas.width / 4, canvas.height / 2, heroSize, heroSize, heroImg1);
-const hero2 = new GameObject((canvas.width * 3) / 4 - heroSize, canvas.height / 2, heroSize * 1.5, heroSize * 1.5, heroImg2);
-const villain = new Villain(canvas.width / 2, canvas.height / 4, 5);
-let webs = [], keys = {};
-
-// Input handling
-window.addEventListener('keydown', e => keys[e.code] = true);
-window.addEventListener('keyup', e => keys[e.code] = false);
-
-// Mouse click handling for character selection
-canvas.addEventListener('click', (e) => {
-    const rect = canvas.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-
-    if (mouseX >= hero1.x && mouseX <= hero1.x + heroSize && mouseY >= hero1.y && mouseY <= hero1.y + heroSize) {
-        characterSelected = hero1;
-        hero = hero1;
-    }
-    if (mouseX >= hero2.x && mouseX <= hero2.x + hero2.width && mouseY >= hero2.y && mouseY <= hero2.y + hero2.height) {
-        characterSelected = hero2;
-        hero = hero2;
-    }
-});
+// Define hero positions
+const hero1 = new GameObject(100, canvas.height / 2, heroSize, heroSize, heroImg1);
+const hero2 = new GameObject(300, canvas.height / 2, heroSize * 1.5, heroSize * 1.5, heroImg2);
 
 // Start screen
 function drawStartScreen() {
@@ -143,57 +129,25 @@ function drawSuitSelect() {
     ctx.fillText('Select Your Suit', canvas.width / 2, canvas.height / 4);
 
     const suits = ['Suit One', 'Suit Two', 'Suit Three', 'Suit Four'];
-    const suitBoxSize = 80; // Reduced the box size to create more space
-    const suitTextYOffset = 110; // Text offset to avoid cutting off text
+    const suitBoxSize = 80; // Suit box size
+    const suitTextYOffset = 110; // Text offset
 
     suits.forEach((suit, index) => {
-        const x = (canvas.width / 5) * (index + 1) - 60; // Adjust spacing between boxes
+        const x = (canvas.width / 5) * (index + 1) - 60; // Adjusted spacing
         const y = canvas.height / 2;
 
         ctx.fillStyle = 'gray';
         ctx.fillRect(x, y, suitBoxSize, suitBoxSize);
 
+        // Display the image for "Suit One"
+        if (index === 0) {
+            ctx.drawImage(suitOneImg, x, y, suitBoxSize, suitBoxSize); // Draw suit one image inside the box
+        }
+
         ctx.font = '20px "Sedgwick Ave", cursive';
         ctx.fillStyle = 'black';
         ctx.fillText(suit, x + suitBoxSize / 2, y + suitTextYOffset);
     });
-}
-
-// Movement and shooting
-let lastShotTime = 0;
-const webCooldown = 300;
-
-function update() {
-    let currentTime = Date.now();
-
-    if (keys['ArrowUp']) hero.y -= heroSpeed;
-    if (keys['ArrowDown']) hero.y += heroSpeed;
-    if (keys['ArrowLeft']) hero.x -= heroSpeed;
-    if (keys['ArrowRight']) hero.x += heroSpeed;
-
-    if (keys['Space'] && currentTime - lastShotTime > webCooldown) {
-        let dir = Math.atan2(keys['ArrowDown'] ? 1 : keys['ArrowUp'] ? -1 : 0, keys['ArrowRight'] ? 1 : keys['ArrowLeft'] ? -1 : 0);
-        webs.push(new Web(hero.x + heroSize / 2, hero.y + heroSize / 2, dir));
-        lastShotTime = currentTime;
-    }
-
-    webs.forEach(web => web.update());
-    webs = webs.filter(web => web.x >= 0 && web.x <= canvas.width && web.y >= 0 && web.y <= canvas.height);
-
-    webs.forEach((web, i) => {
-        if (web.x < villain.x + villain.width && web.x + web.width > villain.x && web.y < villain.y + villain.height && web.y + web.height > villain.y) {
-            villain.takeDamage();
-            webs.splice(i, 1);
-        }
-    });
-}
-
-function drawGame() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    hero.draw();
-    villain.draw();
-    villain.drawHealthBar();
-    webs.forEach(web => web.draw());
 }
 
 // Main game loop
@@ -203,18 +157,17 @@ function gameLoop() {
     } else if (suitSelected === null) {
         drawSuitSelect();
     } else if (gameStarted) {
-        update();
-        drawGame();
+        // Game logic
     } else {
         drawStartScreen();
     }
     requestAnimationFrame(gameLoop);
 }
 
-// Start the game
-window.addEventListener('keydown', e => {
-    if (e.code === 'Space' && characterSelected !== null && suitSelected !== null) {
-        gameStarted = true;
+// Input handling
+window.addEventListener('keydown', (e) => {
+    if (e.code === 'Space' && !gameStarted && characterSelected !== null && suitSelected !== null) {
+        gameStarted = true; // Set game to started
     }
 });
 
