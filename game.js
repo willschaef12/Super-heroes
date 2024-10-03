@@ -150,14 +150,21 @@ function drawStartScreen() {
     ctx.font = '30px Arial';
     ctx.fillStyle = 'black';
     ctx.textAlign = 'center';
-    ctx.fillText('Press Space to Start', canvas.width / 2, canvas.height / 2);
+    ctx.fillText('Welcome to the Game!', canvas.width / 2, canvas.height / 2 - 40);
 
-    // Draw the "Select Character" button
-    ctx.fillStyle = 'blue';
+    // Draw the "Start" button
+    ctx.fillStyle = 'green';
     ctx.fillRect(canvas.width / 2 - 100, canvas.height / 2 + 20, 200, 50);
     ctx.fillStyle = 'white';
     ctx.font = '20px Arial';
-    ctx.fillText('Select Character', canvas.width / 2, canvas.height / 2 + 50);
+    ctx.fillText('Start', canvas.width / 2, canvas.height / 2 + 50);
+    
+    // Draw the "Select Character" button
+    ctx.fillStyle = 'blue';
+    ctx.fillRect(canvas.width / 2 - 100, canvas.height / 2 + 100, 200, 50);
+    ctx.fillStyle = 'white';
+    ctx.font = '20px Arial';
+    ctx.fillText('Select Character', canvas.width / 2, canvas.height / 2 + 120);
 }
 
 // Character selection screen
@@ -207,13 +214,13 @@ function update() {
 
         // Shooting webs
         if (keys['Space'] && Date.now() - lastShotTime >= webCooldown) {
-            webs.push(new Web(hero.x + heroSize / 2, hero.y + heroSize / 2, Math.random() * 2 * Math.PI)); // Random direction
+            webs.push(new Web(hero.x + heroSize / 2, hero.y + heroSize / 2, Math.random() * 2 * Math.PI));
             lastShotTime = Date.now();
         }
-
-        webs.forEach(web => web.update());
-        webs = webs.filter(web => web.x > 0 && web.x < canvas.width && web.y > 0 && web.y < canvas.height); // Remove off-screen webs
     }
+
+    // Update webs
+    webs.forEach(web => web.update());
 }
 
 // Game loop
@@ -235,16 +242,22 @@ function gameLoop() {
     requestAnimationFrame(gameLoop);
 }
 
-// Start game on spacebar or button click
+// Start game on "Start" button click
 canvas.addEventListener('click', (e) => {
     const rect = canvas.getBoundingClientRect();
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
 
-    // Check if the "Select Character" button is clicked
+    // Check if the "Start" button is clicked
     if (!gameStarted && mouseX >= canvas.width / 2 - 100 && mouseX <= canvas.width / 2 + 100 &&
         mouseY >= canvas.height / 2 + 20 && mouseY <= canvas.height / 2 + 70) {
         gameStarted = true;
+        drawCharacterSelect();
+    }
+
+    // Check if the "Select Character" button is clicked
+    if (!characterSelected && mouseX >= canvas.width / 2 - 100 && mouseX <= canvas.width / 2 + 100 &&
+        mouseY >= canvas.height / 2 + 100 && mouseY <= canvas.height / 2 + 150) {
         drawCharacterSelect();
     }
 });
