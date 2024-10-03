@@ -2,7 +2,11 @@ const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
 // Sizes and speeds
-const heroSize = 50, villainSize = 50, heroSpeed = 5, webSpeed = 10, webSize = 20;
+const heroSize = 50,
+    villainSize = 50,
+    heroSpeed = 5,
+    webSpeed = 10,
+    webSize = 20;
 
 // Game state
 let gameStarted = false;
@@ -32,7 +36,7 @@ let imagesLoaded = 0;
 const totalImages = Object.keys(images).length;
 
 function loadImages() {
-    Object.keys(images).forEach(key => {
+    Object.keys(images).forEach((key) => {
         const img = new Image();
         img.src = images[key];
         img.onload = () => {
@@ -106,17 +110,25 @@ let webs = [];
 let keys = {};
 
 // Input handling
-window.addEventListener('keydown', (e) => keys[e.code] = true);
-window.addEventListener('keyup', (e) => keys[e.code] = false);
+window.addEventListener('keydown', (e) => (keys[e.code] = true));
+window.addEventListener('keyup', (e) => (keys[e.code] = false));
 
-// Mouse click handling for character selection
+// Mouse click handling for buttons
 canvas.addEventListener('click', (e) => {
     const rect = canvas.getBoundingClientRect();
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
 
+    // Check if the "Start" button is clicked
+    if (!gameStarted && mouseX >= canvas.width / 2 - 100 && mouseX <= canvas.width / 2 + 100 &&
+        mouseY >= canvas.height / 2 + 20 && mouseY <= canvas.height / 2 + 70) {
+        gameStarted = true; // Set the game started flag
+        drawCharacterSelect(); // Show character selection screen
+        return;
+    }
+
     // Character selection logic
-    if (!characterSelected) {
+    if (gameStarted && !characterSelected) {
         if (mouseX >= hero1.x && mouseX <= hero1.x + heroSize && mouseY >= hero1.y && mouseY <= hero1.y + heroSize) {
             characterSelected = hero1;
             hero = hero1;
@@ -129,7 +141,7 @@ canvas.addEventListener('click', (e) => {
             availableSuits = [loadedImages.batmanSuit1, loadedImages.batmanSuit2, loadedImages.batmanSuit3]; // Batman's suits
             drawSuitSelect();
         }
-    } else if (!suitSelected) {
+    } else if (characterSelected && !suitSelected) {
         availableSuits.forEach((suit, index) => {
             let suitX = canvas.width / (availableSuits.length + 1) * (index + 1);
             if (mouseX >= suitX - heroSize / 2 && mouseX <= suitX + heroSize / 2 &&
@@ -158,13 +170,6 @@ function drawStartScreen() {
     ctx.fillStyle = 'white';
     ctx.font = '20px Arial';
     ctx.fillText('Start', canvas.width / 2, canvas.height / 2 + 50);
-    
-    // Draw the "Select Character" button
-    ctx.fillStyle = 'blue';
-    ctx.fillRect(canvas.width / 2 - 100, canvas.height / 2 + 100, 200, 50);
-    ctx.fillStyle = 'white';
-    ctx.font = '20px Arial';
-    ctx.fillText('Select Character', canvas.width / 2, canvas.height / 2 + 120);
 }
 
 // Character selection screen
@@ -173,6 +178,9 @@ function drawCharacterSelect() {
     ctx.font = 'bold 50px "Sedgwick Ave", cursive';
     ctx.fillStyle = 'red';
     ctx.textAlign = 'center';
+    ctx.fillText('Select a Character', canvas.width / 2, 100); // Title
+
+    ctx.fillStyle = 'black';
     ctx.fillText('Spiderman', canvas.width / 4, hero1.y - 20);
     ctx.strokeStyle = 'red';
     ctx.lineWidth = 5;
@@ -207,14 +215,14 @@ const webCooldown = 300;
 
 function update() {
     if (hero) {
-        if (keys['ArrowUp']) hero.y -= heroSpeed;
-        if (keys['ArrowDown']) hero.y += heroSpeed;
-        if (keys['ArrowLeft']) hero.x -= heroSpeed;
-        if (keys['ArrowRight']) hero.x += heroSpeed;
+        if (keys['ArrowUp'] && hero.y > 0) hero.y -= heroSpeed;
+        if (keys['ArrowDown'] && hero.y < canvas.height - hero.height) hero.y += heroSpeed;
+        if (keys['ArrowLeft'] && hero.x > 0) hero.x -= heroSpeed;
+        if (keys['ArrowRight'] && hero.x < canvas.width - hero.width) hero.x += heroSpeed;
 
-        // Shooting webs
-        if (keys['Space'] && Date.now() - lastShotTime >= webCooldown) {
-            webs.push(new Web(hero.x + heroSize / 2, hero.y + heroSize / 2, Math.random() * 2 * Math.PI));
+        if (keys['Space'] && Date.now() - lastShotTime > webCooldown) {
+            const webDirection = Math.atan2(villain.y - hero.y, villain.x - hero.x);
+            webs.push(new Web(hero.x + hero.width / 2, hero.y + hero.height / 2, webDirection));
             lastShotTime = Date.now();
         }
     }
@@ -225,13 +233,7 @@ function update() {
 
 // Game loop
 function gameLoop() {
-    if (!gameStarted) {
-        drawStartScreen();
-    } else if (!characterSelected) {
-        drawCharacterSelect();
-    } else if (!suitSelected) {
-        drawSuitSelect();
-    } else {
+    if (characterSelected && suitSelected) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         hero.draw();
         villain.draw();
@@ -242,26 +244,5 @@ function gameLoop() {
     requestAnimationFrame(gameLoop);
 }
 
-// Start game on "Start" button click
-canvas.addEventListener('click', (e) => {
-    const rect = canvas.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-
-    // Check if the "Start" button is clicked
-    if (!gameStarted && mouseX >= canvas.width / 2 - 100 && mouseX <= canvas.width / 2 + 100 &&
-        mouseY >= canvas.height / 2 + 20 && mouseY <= canvas.height / 2 + 70) {
-        gameStarted = true;
-        drawCharacterSelect();
-    }
-
-    // Check if the "Select Character" button is clicked
-    if (!characterSelected && mouseX >= canvas.width / 2 - 100 && mouseX <= canvas.width / 2 + 100 &&
-        mouseY >= canvas.height / 2 + 100 && mouseY <= canvas.height / 2 + 150) {
-        drawCharacterSelect();
-    }
-});
-
-// Start the image loading process
-loadImages();
+loadImages(); // Start loading images
 gameLoop(); // Start the game loop
