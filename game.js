@@ -124,7 +124,7 @@ canvas.addEventListener('click', (e) => {
 
     // Check if the "Start" button is clicked
     if (!gameStarted && mouseX >= canvas.width / 2 - 100 && mouseX <= canvas.width / 2 + 100 &&
-        mouseY >= canvas.height / 2 - 10 && mouseY <= canvas.height / 2 + 40) {
+        mouseY >= 130 && mouseY <= 180) { // Updated y-coordinates to match the button
         gameStarted = true; // Set the game started flag
         drawCharacterSelect(); // Show character selection screen
         return;
@@ -148,7 +148,7 @@ canvas.addEventListener('click', (e) => {
         availableSuits.forEach((suit, index) => {
             let suitX = canvas.width / (availableSuits.length + 1) * (index + 1);
             if (mouseX >= suitX - heroSize / 2 && mouseX <= suitX + heroSize / 2 &&
-                mouseY >= 150 && mouseY <= 150 + heroSize) {
+                mouseY >= 90 && mouseY <= 90 + heroSize) { // Adjusted y-coordinates
                 suitSelected = suit;
                 hero.image = suit;
             }
