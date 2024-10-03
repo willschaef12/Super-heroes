@@ -1,4 +1,7 @@
-const canvas = document.getElementById('gameCanvas');
+const canvas = document.createElement('canvas');
+document.body.appendChild(canvas);
+canvas.width = 800; // Set canvas width
+canvas.height = 600; // Set canvas height
 const ctx = canvas.getContext('2d');
 
 // Sizes and speeds
@@ -121,7 +124,7 @@ canvas.addEventListener('click', (e) => {
 
     // Check if the "Start" button is clicked
     if (!gameStarted && mouseX >= canvas.width / 2 - 100 && mouseX <= canvas.width / 2 + 100 &&
-        mouseY >= canvas.height / 2 + 20 && mouseY <= canvas.height / 2 + 70) {
+        mouseY >= canvas.height / 2 - 10 && mouseY <= canvas.height / 2 + 40) {
         gameStarted = true; // Set the game started flag
         drawCharacterSelect(); // Show character selection screen
         return;
@@ -159,17 +162,22 @@ loadImages();
 // Start screen
 function drawStartScreen() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.font = '30px Arial';
-    ctx.fillStyle = 'black';
-    ctx.textAlign = 'center';
-    ctx.fillText('Welcome to the Game!', canvas.width / 2, canvas.height / 2 - 40);
+    
+    // Draw "Heroes Unleashed" title
+    ctx.font = 'bold 60px Arial'; // Change font size and style for the title
+    ctx.fillStyle = 'black'; // Title color
+    ctx.textAlign = 'center'; // Center the text
+    ctx.fillText('Heroes Unleashed', canvas.width / 2, 50); // Title position moved up
+
+    ctx.font = '30px Arial'; // Smaller font for welcome message
+    ctx.fillText('Welcome to the Game!', canvas.width / 2, 90); // Move this text up
 
     // Draw the "Start" button
     ctx.fillStyle = 'green';
-    ctx.fillRect(canvas.width / 2 - 100, canvas.height / 2 + 20, 200, 50);
+    ctx.fillRect(canvas.width / 2 - 100, 130, 200, 50); // Move button up
     ctx.fillStyle = 'white';
     ctx.font = '20px Arial';
-    ctx.fillText('Start', canvas.width / 2, canvas.height / 2 + 50);
+    ctx.fillText('Start', canvas.width / 2, 155); // Adjust position for "Start" text
 }
 
 // Character selection screen
@@ -178,7 +186,7 @@ function drawCharacterSelect() {
     ctx.font = 'bold 50px "Sedgwick Ave", cursive';
     ctx.fillStyle = 'red';
     ctx.textAlign = 'center';
-    ctx.fillText('Select a Character', canvas.width / 2, 100); // Title
+    ctx.fillText('Select a Character', canvas.width / 2, 50); // Title moved up
 
     ctx.fillStyle = 'black';
     ctx.fillText('Spiderman', canvas.width / 4, hero1.y - 20);
@@ -201,11 +209,11 @@ function drawSuitSelect() {
     ctx.font = 'bold 40px "Sedgwick Ave", cursive';
     ctx.fillStyle = 'blue';
     ctx.textAlign = 'center';
-    ctx.fillText('Select a Suit', canvas.width / 2, 100);
+    ctx.fillText('Select a Suit', canvas.width / 2, 50); // Title moved up
 
     availableSuits.forEach((suit, index) => {
-        let suitX = canvas.width / (availableSuits.length + 1) * (index + 1);
-        ctx.drawImage(suit, suitX - heroSize / 2, 150, heroSize, heroSize);
+        const suitX = canvas.width / (availableSuits.length + 1) * (index + 1);
+        ctx.drawImage(suit, suitX - heroSize / 2, 90, heroSize, heroSize); // Move suit images up
     });
 }
 
@@ -245,4 +253,3 @@ function gameLoop() {
 }
 
 loadImages(); // Start loading images
-gameLoop(); // Start the game loop
