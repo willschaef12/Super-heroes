@@ -22,16 +22,21 @@ let hero;
 const images = {
     heroImg1: 'spiderman.png',
     heroImg2: 'batman.png',
+    heroImg3: 'deadpool2.png',  // Deadpool's main image
     villainImg: 'venom.webp',
     webImg: 'web.png',
     heroSelectImg1: 'spiderman2.webp',
     heroSelectImg2: 'batman.webp',
+    heroSelectImg3: 'deadpool.png', // Deadpool selection image
     spidermanSuit1: 'spiderman_suit1.png',
     spidermanSuit2: 'spiderman_suit2.png',
     spidermanSuit3: 'spiderman_suit3.png',
     batmanSuit1: 'batman_suit1.png',
     batmanSuit2: 'batman_suit2.png',
     batmanSuit3: 'batman_suit3.png',
+    deadpoolSuit1: 'deadpool_suit1.png', // Deadpool suit images
+    deadpoolSuit2: 'deadpool_suit2.png',
+    deadpoolSuit3: 'deadpool_suit3.png',
 };
 
 const loadedImages = {};
@@ -108,6 +113,7 @@ class Web extends GameObject {
 // Create objects
 const hero1 = new GameObject(canvas.width / 4, canvas.height / 2, heroSize, heroSize, loadedImages.heroImg1);
 const hero2 = new GameObject((canvas.width * 3) / 4 - heroSize, canvas.height / 2, heroSize * 1.5, heroSize * 1.5, loadedImages.heroImg2);
+const hero3 = new GameObject((canvas.width * 2) / 4 - heroSize / 2, canvas.height / 2 + 100, heroSize * 1.5, heroSize * 1.5, loadedImages.heroImg3); // Deadpool
 const villain = new Villain(canvas.width / 2, canvas.height / 4, 5);
 let webs = [];
 let keys = {};
@@ -142,6 +148,12 @@ canvas.addEventListener('click', (e) => {
             characterSelected = hero2;
             hero = hero2;
             availableSuits = [loadedImages.batmanSuit1, loadedImages.batmanSuit2, loadedImages.batmanSuit3]; // Batman's suits
+            drawSuitSelect();
+        }
+        if (mouseX >= hero3.x && mouseX <= hero3.x + hero3.width && mouseY >= hero3.y && mouseY <= hero3.y + hero3.height) { // Deadpool selection
+            characterSelected = hero3;
+            hero = hero3;
+            availableSuits = [loadedImages.deadpoolSuit1, loadedImages.deadpoolSuit2, loadedImages.deadpoolSuit3]; // Deadpool's suits
             drawSuitSelect();
         }
     } else if (characterSelected && !suitSelected) {
@@ -197,59 +209,29 @@ function drawCharacterSelect() {
 
     ctx.fillStyle = 'black';
     ctx.fillText('Batman', (canvas.width * 3) / 4, hero2.y - 20);
+    ctx.strokeStyle = 'blue';
+    ctx.lineWidth = 5;
+    ctx.strokeRect(hero2.x, hero2.y, hero2.width, hero2.height);
+    ctx.drawImage(loadedImages.heroSelectImg2, hero2.x, hero2.y, hero2.width, hero2.height);
+
+    ctx.fillStyle = 'black';
+    ctx.fillText('Deadpool', (canvas.width * 2) / 4, hero3.y - 20);
     ctx.strokeStyle = 'black';
     ctx.lineWidth = 5;
-    ctx.strokeRect(hero2.x, hero2.y, heroSize * 1.5, heroSize * 1.5);
-    ctx.drawImage(loadedImages.heroSelectImg2, hero2.x, hero2.y, heroSize * 1.5, heroSize * 1.5);
+    ctx.strokeRect(hero3.x, hero3.y, hero3.width, hero3.height);
+    ctx.drawImage(loadedImages.heroSelectImg3, hero3.x, hero3.y, hero3.width, hero3.height);
 }
 
 // Suit selection screen
 function drawSuitSelect() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.font = 'bold 40px "Sedgwick Ave", cursive';
-    ctx.fillStyle = 'blue';
+    ctx.font = 'bold 50px Arial';
+    ctx.fillStyle = 'black';
     ctx.textAlign = 'center';
-    ctx.fillText('Select a Suit', canvas.width / 2, 50); // Title moved up
+    ctx.fillText('Select a Suit', canvas.width / 2, 50); // Adjusted position
 
     availableSuits.forEach((suit, index) => {
-        const suitX = canvas.width / (availableSuits.length + 1) * (index + 1);
-        ctx.drawImage(suit, suitX - heroSize / 2, 90, heroSize, heroSize); // Move suit images up
+        let suitX = canvas.width / (availableSuits.length + 1) * (index + 1);
+        ctx.drawImage(suit, suitX - heroSize / 2, 90, heroSize, heroSize); // Adjusted coordinates
     });
 }
-
-// Movement and shooting
-let lastShotTime = 0;
-const webCooldown = 300;
-
-function update() {
-    if (hero) {
-        if (keys['ArrowUp'] && hero.y > 0) hero.y -= heroSpeed;
-        if (keys['ArrowDown'] && hero.y < canvas.height - hero.height) hero.y += heroSpeed;
-        if (keys['ArrowLeft'] && hero.x > 0) hero.x -= heroSpeed;
-        if (keys['ArrowRight'] && hero.x < canvas.width - hero.width) hero.x += heroSpeed;
-
-        if (keys['Space'] && Date.now() - lastShotTime > webCooldown) {
-            const webDirection = Math.atan2(villain.y - hero.y, villain.x - hero.x);
-            webs.push(new Web(hero.x + hero.width / 2, hero.y + hero.height / 2, webDirection));
-            lastShotTime = Date.now();
-        }
-    }
-
-    // Update webs
-    webs.forEach(web => web.update());
-}
-
-// Game loop
-function gameLoop() {
-    if (characterSelected && suitSelected) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        hero.draw();
-        villain.draw();
-        villain.drawHealthBar();
-        webs.forEach(web => web.draw());
-        update();
-    }
-    requestAnimationFrame(gameLoop);
-}
-
-loadImages(); // Start loading images
