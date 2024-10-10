@@ -23,11 +23,13 @@ const images = {
     heroImg1: 'spiderman.png',
     heroImg2: 'batman.webp',
     heroImg3: 'deadpool2.webp',  // Deadpool's main image
+    heroImg4: 'gambit.webp',     // Gambit's main image
     villainImg: 'venom.webp',
     webImg: 'web.png',
     heroSelectImg1: 'spiderman2.webp',
     heroSelectImg2: 'batman.webp',
     heroSelectImg3: 'deadpool.png', // Deadpool selection image
+    heroSelectImg4: 'gambitselect.jpeg', // Gambit selection image
     spidermanSuit1: 'spiderman_suit1.png',
     spidermanSuit2: 'spiderman_suit2.png',
     spidermanSuit3: 'spiderman_suit3.png',
@@ -37,6 +39,9 @@ const images = {
     deadpoolSuit1: 'deadpool_suit1.png', // Deadpool suit images
     deadpoolSuit2: 'deadpool_suit2.png',
     deadpoolSuit3: 'deadpool_suit3.png',
+    gambitSuit1: 'gambit_suit1.png', // Gambit suit images
+    gambitSuit2: 'gambit_suit2.gif',
+    gambitSuit3: 'gambit_suit3.webp',
 };
 
 const loadedImages = {};
@@ -114,6 +119,7 @@ class Web extends GameObject {
 const hero1 = new GameObject(canvas.width / 4, canvas.height / 2, heroSize, heroSize, loadedImages.heroImg1);
 const hero2 = new GameObject((canvas.width * 3) / 4 - heroSize, canvas.height / 2, heroSize * 1.5, heroSize * 1.5, loadedImages.heroImg2);
 const hero3 = new GameObject((canvas.width * 2) / 4 - heroSize / 2, canvas.height / 2 + 100, heroSize * 1.5, heroSize * 1.5, loadedImages.heroImg3); // Deadpool
+const hero4 = new GameObject(canvas.width / 4, canvas.height / 2 + 200, heroSize * 1.5, heroSize * 1.5, loadedImages.heroImg4); // Gambit
 const villain = new Villain(canvas.width / 2, canvas.height / 4, 5);
 let webs = [];
 let keys = {};
@@ -154,6 +160,12 @@ canvas.addEventListener('click', (e) => {
             characterSelected = hero3;
             hero = hero3;
             availableSuits = [loadedImages.deadpoolSuit1, loadedImages.deadpoolSuit2, loadedImages.deadpoolSuit3]; // Deadpool's suits
+            drawSuitSelect();
+        }
+        if (mouseX >= hero4.x && mouseX <= hero4.x + hero4.width && mouseY >= hero4.y && mouseY <= hero4.y + hero4.height) { // Gambit selection
+            characterSelected = hero4;
+            hero = hero4;
+            availableSuits = [loadedImages.gambitSuit1, loadedImages.gambitSuit2, loadedImages.gambitSuit3]; // Gambit's suits
             drawSuitSelect();
         }
     } else if (characterSelected && !suitSelected) {
@@ -199,7 +211,8 @@ function drawCharacterSelect() {
     ctx.fillStyle = 'red';
     ctx.textAlign = 'center';
     ctx.fillText('Select a Character', canvas.width / 2, 50); // Title moved up
-
+    
+    ctx.font = '30px Arial';
     ctx.fillStyle = 'black';
     ctx.fillText('Spiderman', canvas.width / 4, hero1.y - 20);
     ctx.strokeStyle = 'red';
