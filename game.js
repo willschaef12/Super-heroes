@@ -55,6 +55,7 @@ function loadImages() {
         img.onload = () => {
             loadedImages[key] = img;
             imagesLoaded++;
+            console.log(`Image loaded: ${key}`); // Log the loaded image key
             if (imagesLoaded === totalImages) {
                 drawStartScreen(); // Draw the start screen after images are loaded
             }
@@ -198,53 +199,61 @@ function drawStartScreen() {
 
     // Draw the "Start" button
     ctx.fillStyle = 'green';
-    ctx.fillRect(canvas.width / 2 - 100, 130, 200, 50); // Move button up
-    ctx.fillStyle = 'white';
-    ctx.font = '20px Arial';
-    ctx.fillText('Start', canvas.width / 2, 155); // Adjust position for "Start" text
+    ctx.fillRect(canvas.width / 2 - 100, 130, 200, 50);
+    ctx.fillStyle = 'black';
+    ctx.fillText('Start', canvas.width / 2, 165); // Centered text within the button
 }
 
 // Character selection screen
 function drawCharacterSelect() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.font = 'bold 50px "Sedgwick Ave", cursive';
-    ctx.fillStyle = 'red';
-    ctx.textAlign = 'center';
-    ctx.fillText('Select a Character', canvas.width / 2, 50); // Title moved up
-    
+
     ctx.font = '30px Arial';
     ctx.fillStyle = 'black';
+    ctx.textAlign = 'center';
+    ctx.fillText('Select Your Character', canvas.width / 2, 50);
+
+    // Spiderman
     ctx.fillText('Spiderman', canvas.width / 4, hero1.y - 20);
     ctx.strokeStyle = 'red';
     ctx.lineWidth = 5;
-    ctx.strokeRect(hero1.x, hero1.y, heroSize, heroSize);
-    ctx.drawImage(loadedImages.heroSelectImg1, hero1.x, hero1.y, heroSize, heroSize);
+    ctx.strokeRect(hero1.x, hero1.y, hero1.width, hero1.height);
+    ctx.drawImage(loadedImages.heroSelectImg1, hero1.x, hero1.y, hero1.width, hero1.height);
 
-    ctx.fillStyle = 'black';
+    // Batman
     ctx.fillText('Batman', (canvas.width * 3) / 4, hero2.y - 20);
     ctx.strokeStyle = 'blue';
     ctx.lineWidth = 5;
     ctx.strokeRect(hero2.x, hero2.y, hero2.width, hero2.height);
     ctx.drawImage(loadedImages.heroSelectImg2, hero2.x, hero2.y, hero2.width, hero2.height);
 
-    ctx.fillStyle = 'black';
+    // Deadpool
     ctx.fillText('Deadpool', (canvas.width * 2) / 4, hero3.y - 20);
     ctx.strokeStyle = 'black';
     ctx.lineWidth = 5;
     ctx.strokeRect(hero3.x, hero3.y, hero3.width, hero3.height);
     ctx.drawImage(loadedImages.heroSelectImg3, hero3.x, hero3.y, hero3.width, hero3.height);
+
+    // Gambit
+    ctx.fillText('Gambit', canvas.width / 4, hero4.y - 20); // Adjusted text position for Gambit
+    ctx.strokeStyle = 'purple'; // Gambit's color
+    ctx.lineWidth = 5;
+    ctx.strokeRect(hero4.x, hero4.y, hero4.width, hero4.height);
+    ctx.drawImage(loadedImages.heroSelectImg4, hero4.x, hero4.y, hero4.width, hero4.height); // Draw Gambit's selection image
 }
 
 // Suit selection screen
 function drawSuitSelect() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.font = 'bold 50px Arial';
+    
+    ctx.font = '30px Arial';
     ctx.fillStyle = 'black';
     ctx.textAlign = 'center';
-    ctx.fillText('Select a Suit', canvas.width / 2, 50); // Adjusted position
+    ctx.fillText('Select a Suit', canvas.width / 2, 50);
 
     availableSuits.forEach((suit, index) => {
-        let suitX = canvas.width / (availableSuits.length + 1) * (index + 1);
-        ctx.drawImage(suit, suitX - heroSize / 2, 90, heroSize, heroSize); // Adjusted coordinates
+        const suitX = canvas.width / (availableSuits.length + 1) * (index + 1);
+        ctx.drawImage(suit, suitX - heroSize / 2, 90, heroSize, heroSize); // Adjusted y-coordinates for the suits
     });
 }
+
