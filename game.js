@@ -22,7 +22,7 @@ let hero;
 const images = {
     heroImg1: 'spiderman.png',
     heroImg2: 'batman.webp',
-    heroImg3: 'deadpool_suit3.png',  // Deadpool's main image
+    heroImg3: 'deadpool2.webp',  // Deadpool's main image
     villainImg: 'venom.webp',
     webImg: 'web.png',
     heroSelectImg1: 'spiderman2.webp',
