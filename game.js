@@ -324,7 +324,6 @@ function drawCharacterSelect() {
   });
 }
 
-// Suit selection screen
 function drawSuitSelect() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -333,17 +332,17 @@ function drawSuitSelect() {
   ctx.textAlign = "center";
   ctx.fillText("Select a Suit", canvas.width / 2, 50);
 
-  const spacing = 20;
-  const suitWidth = heroSize;
-  const numPerRow = Math.floor(
-    (canvas.width + spacing) / (suitWidth + spacing)
-  );
+  const spacing = 40; // Space between each suit
+  const suitWidth = heroSize; // Width of each suit image
+
+  // Calculate the total width of the row of suits
+  const totalRowWidth =
+    availableSuits.length * suitWidth + (availableSuits.length - 1) * spacing;
+  const startX = (canvas.width - totalRowWidth) / 2; // Center the suits horizontally
 
   availableSuits.forEach((suitImage, index) => {
-    const row = Math.floor(index / numPerRow);
-    const col = index % numPerRow;
-    const x = spacing + col * (suitWidth + spacing);
-    const y = 90 + row * (suitWidth + spacing);
+    const x = startX + index * (suitWidth + spacing);
+    const y = 90; // Fixed y-position for suits
 
     ctx.drawImage(suitImage, x, y, suitWidth, suitWidth);
   });
