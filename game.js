@@ -20,7 +20,7 @@ let availableSuits = [];
 let hero;
 
 // Define a simple list of hero names
-const heroNames = ["Spiderman", "Batman", "Deadpool", "Gambit", "Test"];
+const heroNames = ["Spiderman", "Batman", "Deadpool", "Gambit"];
 
 // Generate image filenames dynamically
 const imageFilenames = [];
