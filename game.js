@@ -1,3 +1,4 @@
+// Create and configure the canvas
 const canvas = document.createElement("canvas");
 document.body.appendChild(canvas);
 canvas.width = 800; // Set canvas width
@@ -19,7 +20,7 @@ let availableSuits = [];
 let hero;
 
 // Define a simple list of hero names
-const heroNames = ["Spiderman", "Batman", "Deadpool", "Gambit"];
+const heroNames = ["Spiderman", "Batman", "Deadpool", "Gambit", "Test"];
 
 // Generate image filenames dynamically
 const imageFilenames = [];
@@ -86,7 +87,7 @@ function buildHeroData() {
       mainImage: mainImage,
       selectImage: selectImage,
       suits: suits,
-      color: "black", // Default color
+      color: "black", // Default color; you can customize this if needed
     });
   });
 }
@@ -191,7 +192,9 @@ canvas.addEventListener("click", (e) => {
           heroSize,
           heroObj.hero.mainImage
         );
-        availableSuits = heroObj.hero.suits;
+        availableSuits = heroObj.hero.suits.filter(
+          (suitImage) => suitImage !== undefined
+        );
         drawSuitSelect();
         break;
       }
@@ -212,6 +215,7 @@ canvas.addEventListener("click", (e) => {
         // Proceed to start the main game loop or next step
         // For example:
         // startGame();
+        return;
       }
     });
   }
@@ -222,18 +226,19 @@ function drawStartScreen() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   // Draw "Heroes Unleashed" title
-  ctx.font = "bold 60px Arial"; // Change font size and style for the title
+  ctx.font = "bold 60px Raleway"; // Use Raleway font
   ctx.fillStyle = "black"; // Title color
   ctx.textAlign = "center"; // Center the text
-  ctx.fillText("Heroes Unleashed", canvas.width / 2, 50); // Title position moved up
+  ctx.fillText("Heroes Unleashed", canvas.width / 2, 70); // Adjusted position
 
-  ctx.font = "30px Arial"; // Smaller font for welcome message
-  ctx.fillText("Welcome to the Game!", canvas.width / 2, 90); // Move this text up
+  ctx.font = "30px Raleway"; // Smaller font for welcome message
+  ctx.fillText("Welcome to the Game!", canvas.width / 2, 110); // Adjusted position
 
   // Draw the "Start" button
   ctx.fillStyle = "green";
   ctx.fillRect(canvas.width / 2 - 100, 130, 200, 50);
   ctx.fillStyle = "black";
+  ctx.font = "30px Raleway"; // Ensure consistent font
   ctx.fillText("Start", canvas.width / 2, 165); // Centered text within the button
 }
 
@@ -246,7 +251,7 @@ function createHeroObjects() {
     const col = index % numPerRow;
     const x =
       (canvas.width / (numPerRow + 1)) * (col + 1) - (heroSize * 1.5) / 2;
-    const y = 150 + row * 200; // Adjusted y-position for better spacing
+    const y = 200 + row * 200; // Adjusted y-position for better spacing
 
     const width = heroSize * 1.5;
     const height = heroSize * 1.5;
@@ -263,7 +268,7 @@ function createHeroObjects() {
 function drawCharacterSelect() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  ctx.font = "30px Arial";
+  ctx.font = "30px Raleway";
   ctx.fillStyle = "black";
   ctx.textAlign = "center";
   ctx.fillText("Select Your Character", canvas.width / 2, 50);
@@ -303,7 +308,7 @@ function drawCharacterSelect() {
 function drawSuitSelect() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  ctx.font = "30px Arial";
+  ctx.font = "30px Raleway";
   ctx.fillStyle = "black";
   ctx.textAlign = "center";
   ctx.fillText("Select a Suit", canvas.width / 2, 50);
