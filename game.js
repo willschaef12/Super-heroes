@@ -242,19 +242,33 @@ function drawStartScreen() {
   ctx.fillText("Start", canvas.width / 2, 165); // Centered text within the button
 }
 
-// Create hero objects for selection
 function createHeroObjects() {
+  const spacing = 40; // Space between each hero
+  const heroWidth = heroSize * 1.5;
+
+  // Calculate the maximum number of heroes that can fit per row
+  const numPerRow = Math.floor(
+    (canvas.width + spacing) / (heroWidth + spacing)
+  );
+
   heroData.forEach((hero, index) => {
-    // Determine positions
-    const numPerRow = 2; // Number of heroes per row
     const row = Math.floor(index / numPerRow);
     const col = index % numPerRow;
-    const x =
-      (canvas.width / (numPerRow + 1)) * (col + 1) - (heroSize * 1.5) / 2;
-    const y = 200 + row * 200; // Adjusted y-position for better spacing
 
-    const width = heroSize * 1.5;
-    const height = heroSize * 1.5;
+    // Calculate the number of heroes in the current row to center it properly
+    const currentRowCount = Math.min(
+      heroData.length - row * numPerRow,
+      numPerRow
+    );
+    const totalRowWidth =
+      currentRowCount * heroWidth + (currentRowCount - 1) * spacing;
+    const startX = (canvas.width - totalRowWidth) / 2; // Centering the row
+
+    const x = startX + col * (heroWidth + spacing);
+    const y = 150 + row * (heroWidth + spacing); // Adjusted y-position for better spacing
+
+    const width = heroWidth;
+    const height = heroWidth; // Keep the aspect ratio square
     const image = hero.selectImage; // Selection image
     const gameObject = new GameObject(x, y, width, height, image);
     heroObjects.push({
@@ -264,7 +278,6 @@ function createHeroObjects() {
   });
 }
 
-// Character selection screen
 function drawCharacterSelect() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -281,13 +294,20 @@ function drawCharacterSelect() {
   heroObjects.forEach((heroObj) => {
     const hero = heroObj.hero;
     const gameObject = heroObj.gameObject;
+
+    // Center the character name above each image
+    ctx.font = "20px Raleway"; // Adjust the font size for names
+    ctx.fillStyle = "black";
+    ctx.textAlign = "center";
     ctx.fillText(
       hero.name,
       gameObject.x + gameObject.width / 2,
-      gameObject.y - 20
+      gameObject.y - 10 // Position text slightly above the image
     );
+
+    // Draw border and image for each hero
     ctx.strokeStyle = hero.color || "black";
-    ctx.lineWidth = 5;
+    ctx.lineWidth = 2;
     ctx.strokeRect(
       gameObject.x,
       gameObject.y,
@@ -313,9 +333,18 @@ function drawSuitSelect() {
   ctx.textAlign = "center";
   ctx.fillText("Select a Suit", canvas.width / 2, 50);
 
+  const spacing = 20;
+  const suitWidth = heroSize;
+  const numPerRow = Math.floor(
+    (canvas.width + spacing) / (suitWidth + spacing)
+  );
+
   availableSuits.forEach((suitImage, index) => {
-    const suitX =
-      (canvas.width / (availableSuits.length + 1)) * (index + 1) - heroSize / 2;
-    ctx.drawImage(suitImage, suitX, 90, heroSize, heroSize);
+    const row = Math.floor(index / numPerRow);
+    const col = index % numPerRow;
+    const x = spacing + col * (suitWidth + spacing);
+    const y = 90 + row * (suitWidth + spacing);
+
+    ctx.drawImage(suitImage, x, y, suitWidth, suitWidth);
   });
 }
