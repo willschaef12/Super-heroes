@@ -3,16 +3,17 @@ const canvas = document.createElement("canvas");
 document.body.appendChild(canvas);
 const ctx = canvas.getContext("2d");
 
-// Fixed canvas size
-const canvasWidth = 800;
-const canvasHeight = 600;
+// Ensure the canvas fills the screen
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  drawStartScreen(); // Redraw after resizing
+}
+window.addEventListener("resize", resizeCanvas);
+resizeCanvas(); // Initial resize to fit the screen
 
-// Game settings
-canvas.width = canvasWidth;
-canvas.height = canvasHeight;
-
-const heroSize = 50;
-const villainSize = 50;
+const heroSize = 100; // Adjusted for better scaling
+const villainSize = 100;
 const webSize = 20;
 
 // Game state
@@ -73,19 +74,19 @@ function buildHeroData() {
 
 // Draw start screen
 function drawStartScreen() {
-ctx.clearRect(0, 0, canvas.width, canvas.height);
-ctx.font = "bold 40px Arial";
-ctx.fillStyle = "black";
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.font = "bold 40px Arial";
+  ctx.fillStyle = "black";
   ctx.textAlign = "center";
-ctx.fillText("Heroes Unleashed", canvas.width / 2, 100);
-ctx.font = "20px Arial";
-ctx.fillText("Welcome to the Game!", canvas.width / 2, 150);
-  
-ctx.fillStyle = "green";
-  ctx.fillRect(canvas.width / 2 - 75, 200, 150, 50);
-ctx.fillStyle = "white";
-ctx.font = "25px Arial";
-  ctx.fillText("Start", canvas.width / 2, 235);
+  ctx.fillText("Heroes Unleashed", canvas.width / 2, canvas.height / 4);
+  ctx.font = "20px Arial";
+  ctx.fillText("Welcome to the Game!", canvas.width / 2, canvas.height / 4 + 50);
+
+  ctx.fillStyle = "green";
+  ctx.fillRect(canvas.width / 2 - 75, canvas.height / 2 - 25, 150, 50);
+  ctx.fillStyle = "white";
+  ctx.font = "25px Arial";
+  ctx.fillText("Start", canvas.width / 2, canvas.height / 2 + 10);
 }
 
 // Draw character selection screen
@@ -137,7 +138,7 @@ canvas.addEventListener("click", (e) => {
   const mouseX = e.clientX - rect.left;
   const mouseY = e.clientY - rect.top;
 
-  if (!gameStarted && mouseX >= canvas.width / 2 - 75 && mouseX <= canvas.width / 2 + 75 && mouseY >= 200 && mouseY <= 250) {
+  if (!gameStarted && mouseX >= canvas.width / 2 - 75 && mouseX <= canvas.width / 2 + 75 && mouseY >= canvas.height / 2 - 25 && mouseY <= canvas.height / 2 + 25) {
     gameStarted = true;
     drawCharacterSelect();
     return;
